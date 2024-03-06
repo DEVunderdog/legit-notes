@@ -9,7 +9,13 @@ import (
 )
 
 type Querier interface {
+	CreateNote(ctx context.Context, arg CreateNoteParams) (Note, error)
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
+	DeleteAccount(ctx context.Context, id int32) error
+	DeleteAllNotes(ctx context.Context) error
+	DeleteNote(ctx context.Context, id int32) error
+	GetNote(ctx context.Context, id int32) (Note, error)
+	ListNotes(ctx context.Context, arg ListNotesParams) ([]Note, error)
 }
 
 var _ Querier = (*Queries)(nil)

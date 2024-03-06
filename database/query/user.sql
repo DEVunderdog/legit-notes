@@ -6,3 +6,7 @@ INSERT INTO users (
 ) VALUES (
     $1, $2, $3
 ) RETURNING *;
+
+-- name: DeleteAccount :exec
+DELETE FROM users
+WHERE id = $1;
