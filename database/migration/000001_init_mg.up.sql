@@ -8,7 +8,7 @@ CREATE TABLE "users" (
 
 CREATE TABLE "notes" (
   "id" SERIAL PRIMARY KEY,
-  "user_id" integer,
+  "user_id" integer NOT NULL,
   "title" varchar NOT NULL,
   "description" varchar NOT NULL,
   "created_at" timestamp NOT NULL DEFAULT (now()),

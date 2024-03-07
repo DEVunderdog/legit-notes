@@ -18,6 +18,22 @@ ORDER BY id
 LIMIT $2
 OFFSET $3;
 
+-- name: UpdateNoteTitle :one
+UPDATE notes SET title = COALESCE($2, title),
+updated_at = now()
+WHERE id = $1 RETURNING *;
+
+-- name: UpdateNoteDescription :one
+UPDATE notes SET description = COALESCE($2, description),
+updated_at = now()
+WHERE id = $1 RETURNING *;
+
+-- name: UpdateNote :one
+UPDATE notes SET title = COALESCE($2, title),
+description = COALESCE($3, description),
+updated_at = now()
+WHERE id = $1 RETURNING *;
+
 -- name: DeleteNote :exec
 DELETE FROM notes
 WHERE id = $1;

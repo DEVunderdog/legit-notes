@@ -10,12 +10,12 @@ import (
 )
 
 type Note struct {
-	ID          int32         `json:"id"`
-	UserID      sql.NullInt32 `json:"user_id"`
-	Title       string        `json:"title"`
-	Description string        `json:"description"`
-	CreatedAt   time.Time     `json:"created_at"`
-	UpdatedAt   sql.NullTime  `json:"updated_at"`
+	ID          int32        `json:"id"`
+	UserID      int32        `json:"user_id"`
+	Title       string       `json:"title"`
+	Description string       `json:"description"`
+	CreatedAt   time.Time    `json:"created_at"`
+	UpdatedAt   sql.NullTime `json:"updated_at"`
 }
 
 type User struct {

@@ -36,8 +36,11 @@ func PasswordGenerator() string {
 	k := len(alphabet)
 	m := len(specialCharacters)
 	for i := 0; i < 8; i++ {
-		c := alphabet[rand.Intn(k)] + specialCharacters[rand.Intn(m)]
+		c := alphabet[rand.Intn(k)] 
+		d := specialCharacters[rand.Intn(m)]
+		
 		sb.WriteByte(c)
+		sb.WriteByte(d)
 	}
 
 	return sb.String()

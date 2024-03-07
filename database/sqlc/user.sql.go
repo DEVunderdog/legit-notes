@@ -47,3 +47,27 @@ func (q *Queries) DeleteAccount(ctx context.Context, id int32) error {
 	_, err := q.db.ExecContext(ctx, deleteAccount, id)
 	return err
 }
+
+const updateAccount = `-- name: UpdateAccount :one
+UPDATE users SET password = $2
+WHERE id = $1
+RETURNING id, username, email, password, created_at
+`
+
+type UpdateAccountParams struct {
+	ID       int32  `json:"id"`
+	Password string `json:"password"`
+}
+
+func (q *Queries) UpdateAccount(ctx context.Context, arg UpdateAccountParams) (User, error) {
+	row := q.db.QueryRowContext(ctx, updateAccount, arg.ID, arg.Password)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Username,
+		&i.Email,
+		&i.Password,
+		&i.CreatedAt,
+	)
+	return i, err
+}

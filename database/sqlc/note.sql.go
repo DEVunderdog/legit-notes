@@ -7,7 +7,6 @@ package database
 
 import (
 	"context"
-	"database/sql"
 )
 
 const createNote = `-- name: CreateNote :one
@@ -21,9 +20,9 @@ INSERT INTO notes (
 `
 
 type CreateNoteParams struct {
-	UserID      sql.NullInt32 `json:"user_id"`
-	Title       string        `json:"title"`
-	Description string        `json:"description"`
+	UserID      int32  `json:"user_id"`
+	Title       string `json:"title"`
+	Description string `json:"description"`
 }
 
 func (q *Queries) CreateNote(ctx context.Context, arg CreateNoteParams) (Note, error) {
@@ -87,9 +86,9 @@ OFFSET $3
 `
 
 type ListNotesParams struct {
-	UserID sql.NullInt32 `json:"user_id"`
-	Limit  int32         `json:"limit"`
-	Offset int32         `json:"offset"`
+	UserID int32 `json:"user_id"`
+	Limit  int32 `json:"limit"`
+	Offset int32 `json:"offset"`
 }
 
 func (q *Queries) ListNotes(ctx context.Context, arg ListNotesParams) ([]Note, error) {
@@ -120,4 +119,81 @@ func (q *Queries) ListNotes(ctx context.Context, arg ListNotesParams) ([]Note, e
 		return nil, err
 	}
 	return items, nil
+}
+
+const updateNote = `-- name: UpdateNote :one
+UPDATE notes SET title = COALESCE($2, title),
+description = COALESCE($3, description),
+updated_at = now()
+WHERE id = $1 RETURNING id, user_id, title, description, created_at, updated_at
+`
+
+type UpdateNoteParams struct {
+	ID          int32  `json:"id"`
+	Title       string `json:"title"`
+	Description string `json:"description"`
+}
+
+func (q *Queries) UpdateNote(ctx context.Context, arg UpdateNoteParams) (Note, error) {
+	row := q.db.QueryRowContext(ctx, updateNote, arg.ID, arg.Title, arg.Description)
+	var i Note
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.Title,
+		&i.Description,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const updateNoteDescription = `-- name: UpdateNoteDescription :one
+UPDATE notes SET description = COALESCE($2, description),
+updated_at = now()
+WHERE id = $1 RETURNING id, user_id, title, description, created_at, updated_at
+`
+
+type UpdateNoteDescriptionParams struct {
+	ID          int32  `json:"id"`
+	Description string `json:"description"`
+}
+
+func (q *Queries) UpdateNoteDescription(ctx context.Context, arg UpdateNoteDescriptionParams) (Note, error) {
+	row := q.db.QueryRowContext(ctx, updateNoteDescription, arg.ID, arg.Description)
+	var i Note
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.Title,
+		&i.Description,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const updateNoteTitle = `-- name: UpdateNoteTitle :one
+UPDATE notes SET title = COALESCE($2, title),
+updated_at = now()
+WHERE id = $1 RETURNING id, user_id, title, description, created_at, updated_at
+`
+
+type UpdateNoteTitleParams struct {
+	ID    int32  `json:"id"`
+	Title string `json:"title"`
+}
+
+func (q *Queries) UpdateNoteTitle(ctx context.Context, arg UpdateNoteTitleParams) (Note, error) {
+	row := q.db.QueryRowContext(ctx, updateNoteTitle, arg.ID, arg.Title)
+	var i Note
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.Title,
+		&i.Description,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
 }

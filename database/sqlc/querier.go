@@ -16,6 +16,10 @@ type Querier interface {
 	DeleteNote(ctx context.Context, id int32) error
 	GetNote(ctx context.Context, id int32) (Note, error)
 	ListNotes(ctx context.Context, arg ListNotesParams) ([]Note, error)
+	UpdateAccount(ctx context.Context, arg UpdateAccountParams) (User, error)
+	UpdateNote(ctx context.Context, arg UpdateNoteParams) (Note, error)
+	UpdateNoteDescription(ctx context.Context, arg UpdateNoteDescriptionParams) (Note, error)
+	UpdateNoteTitle(ctx context.Context, arg UpdateNoteTitleParams) (Note, error)
 }
 
 var _ Querier = (*Queries)(nil)
