@@ -2,16 +2,16 @@
 INSERT INTO users (
     username,
     email,
-    password
+    hashed_password
 ) VALUES (
     $1, $2, $3
 ) RETURNING *;
 
--- name: UpdateAccount :one
-UPDATE users SET password = $2
-WHERE id = $1
-RETURNING *;
 
 -- name: DeleteAccount :exec
 DELETE FROM users
 WHERE id = $1;
+
+-- name: GetUser :one
+SELECT * FROM users
+WHERE username = $1 LIMIT 1;

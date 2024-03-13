@@ -13,26 +13,27 @@ const createUser = `-- name: CreateUser :one
 INSERT INTO users (
     username,
     email,
-    password
+    hashed_password
 ) VALUES (
     $1, $2, $3
-) RETURNING id, username, email, password, created_at
+) RETURNING id, username, email, hashed_password, password_changed_at, created_at
 `
 
 type CreateUserParams struct {
-	Username string `json:"username"`
-	Email    string `json:"email"`
-	Password string `json:"password"`
+	Username       string `json:"username"`
+	Email          string `json:"email"`
+	HashedPassword string `json:"hashed_password"`
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
-	row := q.db.QueryRowContext(ctx, createUser, arg.Username, arg.Email, arg.Password)
+	row := q.db.QueryRowContext(ctx, createUser, arg.Username, arg.Email, arg.HashedPassword)
 	var i User
 	err := row.Scan(
 		&i.ID,
 		&i.Username,
 		&i.Email,
-		&i.Password,
+		&i.HashedPassword,
+		&i.PasswordChangedAt,
 		&i.CreatedAt,
 	)
 	return i, err
@@ -48,25 +49,20 @@ func (q *Queries) DeleteAccount(ctx context.Context, id int32) error {
 	return err
 }
 
-const updateAccount = `-- name: UpdateAccount :one
-UPDATE users SET password = $2
-WHERE id = $1
-RETURNING id, username, email, password, created_at
+const getUser = `-- name: GetUser :one
+SELECT id, username, email, hashed_password, password_changed_at, created_at FROM users
+WHERE username = $1 LIMIT 1
 `
 
-type UpdateAccountParams struct {
-	ID       int32  `json:"id"`
-	Password string `json:"password"`
-}
-
-func (q *Queries) UpdateAccount(ctx context.Context, arg UpdateAccountParams) (User, error) {
-	row := q.db.QueryRowContext(ctx, updateAccount, arg.ID, arg.Password)
+func (q *Queries) GetUser(ctx context.Context, username string) (User, error) {
+	row := q.db.QueryRowContext(ctx, getUser, username)
 	var i User
 	err := row.Scan(
 		&i.ID,
 		&i.Username,
 		&i.Email,
-		&i.Password,
+		&i.HashedPassword,
+		&i.PasswordChangedAt,
 		&i.CreatedAt,
 	)
 	return i, err
