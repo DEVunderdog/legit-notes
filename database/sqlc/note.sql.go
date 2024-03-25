@@ -7,6 +7,7 @@ package database
 
 import (
 	"context"
+	"database/sql"
 )
 
 const createNote = `-- name: CreateNote :one
@@ -20,7 +21,7 @@ INSERT INTO notes (
 `
 
 type CreateNoteParams struct {
-	UserID      int32  `json:"user_id"`
+	UserID      string `json:"user_id"`
 	Title       string `json:"title"`
 	Description string `json:"description"`
 }
@@ -53,18 +54,23 @@ DELETE FROM notes
 WHERE id = $1
 `
 
-func (q *Queries) DeleteNote(ctx context.Context, id int32) error {
+func (q *Queries) DeleteNote(ctx context.Context, id sql.NullInt32) error {
 	_, err := q.db.ExecContext(ctx, deleteNote, id)
 	return err
 }
 
 const getNote = `-- name: GetNote :one
 SELECT id, user_id, title, description, created_at, updated_at FROM notes
-WHERE id = $1 LIMIT 1
+WHERE user_id = $1 AND id = $2 LIMIT 1
 `
 
-func (q *Queries) GetNote(ctx context.Context, id int32) (Note, error) {
-	row := q.db.QueryRowContext(ctx, getNote, id)
+type GetNoteParams struct {
+	UserID string        `json:"user_id"`
+	ID     sql.NullInt32 `json:"id"`
+}
+
+func (q *Queries) GetNote(ctx context.Context, arg GetNoteParams) (Note, error) {
+	row := q.db.QueryRowContext(ctx, getNote, arg.UserID, arg.ID)
 	var i Note
 	err := row.Scan(
 		&i.ID,
@@ -86,9 +92,9 @@ OFFSET $3
 `
 
 type ListNotesParams struct {
-	UserID int32 `json:"user_id"`
-	Limit  int32 `json:"limit"`
-	Offset int32 `json:"offset"`
+	UserID string `json:"user_id"`
+	Limit  int32  `json:"limit"`
+	Offset int32  `json:"offset"`
 }
 
 func (q *Queries) ListNotes(ctx context.Context, arg ListNotesParams) ([]Note, error) {
@@ -129,9 +135,9 @@ WHERE id = $1 RETURNING id, user_id, title, description, created_at, updated_at
 `
 
 type UpdateNoteParams struct {
-	ID          int32  `json:"id"`
-	Title       string `json:"title"`
-	Description string `json:"description"`
+	ID          sql.NullInt32 `json:"id"`
+	Title       string        `json:"title"`
+	Description string        `json:"description"`
 }
 
 func (q *Queries) UpdateNote(ctx context.Context, arg UpdateNoteParams) (Note, error) {
@@ -155,8 +161,8 @@ WHERE id = $1 RETURNING id, user_id, title, description, created_at, updated_at
 `
 
 type UpdateNoteDescriptionParams struct {
-	ID          int32  `json:"id"`
-	Description string `json:"description"`
+	ID          sql.NullInt32 `json:"id"`
+	Description string        `json:"description"`
 }
 
 func (q *Queries) UpdateNoteDescription(ctx context.Context, arg UpdateNoteDescriptionParams) (Note, error) {
@@ -180,8 +186,8 @@ WHERE id = $1 RETURNING id, user_id, title, description, created_at, updated_at
 `
 
 type UpdateNoteTitleParams struct {
-	ID    int32  `json:"id"`
-	Title string `json:"title"`
+	ID    sql.NullInt32 `json:"id"`
+	Title string        `json:"title"`
 }
 
 func (q *Queries) UpdateNoteTitle(ctx context.Context, arg UpdateNoteTitleParams) (Note, error) {

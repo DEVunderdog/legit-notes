@@ -9,7 +9,7 @@ INSERT INTO notes (
 
 -- name: GetNote :one
 SELECT * FROM notes
-WHERE id = $1 LIMIT 1;
+WHERE user_id = $1 AND id = $2 LIMIT 1;
 
 -- name: ListNotes :many
 SELECT * FROM notes

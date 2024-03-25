@@ -7,6 +7,7 @@ package database
 
 import (
 	"context"
+	"database/sql"
 )
 
 const createUser = `-- name: CreateUser :one
@@ -44,7 +45,7 @@ DELETE FROM users
 WHERE id = $1
 `
 
-func (q *Queries) DeleteAccount(ctx context.Context, id int32) error {
+func (q *Queries) DeleteAccount(ctx context.Context, id sql.NullInt32) error {
 	_, err := q.db.ExecContext(ctx, deleteAccount, id)
 	return err
 }

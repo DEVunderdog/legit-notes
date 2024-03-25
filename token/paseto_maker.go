@@ -31,18 +31,20 @@ func NewPasetoMaker(symmetricKey string)(Maker, error) {
 	// mention the error because then we are just returning PasetoMaker struct reference
 }
 
-func (maker *PasetoMaker) CreateToken(username string, duration time.Duration) (string, error) {
+func (maker *PasetoMaker) CreateToken(username string, duration time.Duration) (string, *Payload,error) {
 	// The capability of using the pointer is that the instance on which this method is called
 	// can manipulate the state.
 	payload, err := NewPayload(username, duration) // Creating the payload based on username and duration provided
 
 	if err != nil {
-		return "", err
+		return "", payload,err
 	}
 
-	return maker.paseto.Encrypt(maker.symmetricKey, payload, nil)
+	token, err := maker.paseto.Encrypt(maker.symmetricKey, payload, nil)
 	// The method on the instance it is called has paseto's instance hence calling
 	// the Encrypt on it and encrypting the and returning token with payload provided
+
+	return token, payload, err
 }
 
 func (maker *PasetoMaker) VerifyToken(token string) (*Payload, error) {

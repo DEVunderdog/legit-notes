@@ -7,22 +7,35 @@ package database
 import (
 	"database/sql"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 type Note struct {
-	ID          int32        `json:"id"`
-	UserID      int32        `json:"user_id"`
-	Title       string       `json:"title"`
-	Description string       `json:"description"`
-	CreatedAt   time.Time    `json:"created_at"`
-	UpdatedAt   sql.NullTime `json:"updated_at"`
+	ID          sql.NullInt32 `json:"id"`
+	UserID      string        `json:"user_id"`
+	Title       string        `json:"title"`
+	Description string        `json:"description"`
+	CreatedAt   time.Time     `json:"created_at"`
+	UpdatedAt   sql.NullTime  `json:"updated_at"`
+}
+
+type Session struct {
+	ID           uuid.UUID `json:"id"`
+	Username     string    `json:"username"`
+	RefreshToken string    `json:"refresh_token"`
+	UserAgent    string    `json:"user_agent"`
+	ClientIp     string    `json:"client_ip"`
+	IsBlocked    bool      `json:"is_blocked"`
+	ExpiresAt    time.Time `json:"expires_at"`
+	CreatedAt    time.Time `json:"created_at"`
 }
 
 type User struct {
-	ID                int32     `json:"id"`
-	Username          string    `json:"username"`
-	Email             string    `json:"email"`
-	HashedPassword    string    `json:"hashed_password"`
-	PasswordChangedAt time.Time `json:"password_changed_at"`
-	CreatedAt         time.Time `json:"created_at"`
+	ID                sql.NullInt32 `json:"id"`
+	Username          string        `json:"username"`
+	Email             string        `json:"email"`
+	HashedPassword    string        `json:"hashed_password"`
+	PasswordChangedAt time.Time     `json:"password_changed_at"`
+	CreatedAt         time.Time     `json:"created_at"`
 }

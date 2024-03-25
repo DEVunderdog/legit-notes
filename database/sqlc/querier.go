@@ -6,15 +6,20 @@ package database
 
 import (
 	"context"
+	"database/sql"
+
+	"github.com/google/uuid"
 )
 
 type Querier interface {
 	CreateNote(ctx context.Context, arg CreateNoteParams) (Note, error)
+	CreateSession(ctx context.Context, arg CreateSessionParams) (Session, error)
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
-	DeleteAccount(ctx context.Context, id int32) error
+	DeleteAccount(ctx context.Context, id sql.NullInt32) error
 	DeleteAllNotes(ctx context.Context) error
-	DeleteNote(ctx context.Context, id int32) error
-	GetNote(ctx context.Context, id int32) (Note, error)
+	DeleteNote(ctx context.Context, id sql.NullInt32) error
+	GetNote(ctx context.Context, arg GetNoteParams) (Note, error)
+	GetSession(ctx context.Context, id uuid.UUID) (Session, error)
 	GetUser(ctx context.Context, username string) (User, error)
 	ListNotes(ctx context.Context, arg ListNotesParams) ([]Note, error)
 	UpdateNote(ctx context.Context, arg UpdateNoteParams) (Note, error)
